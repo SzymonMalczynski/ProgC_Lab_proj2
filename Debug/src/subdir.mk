@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/projektvol2.c 
+../src/ProjektC2.c 
 
 OBJS += \
-./src/projektvol2.o 
+./src/ProjektC2.o 
 
 C_DEPS += \
-./src/projektvol2.d 
+./src/ProjektC2.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
