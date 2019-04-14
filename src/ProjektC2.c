@@ -25,6 +25,84 @@
 #include <netpacket/packet.h>
 #include <net/ethernet.h>
 
+
+
+
+
+
+typedef unsigned short u16;
+typedef unsigned long u32;
+
+u16 udp_sum_calc(u16 len_udp, u16 src_addr[],u16 dest_addr[], u16 buff[])
+{
+u16 prot_udp=17;
+u16 padd=0;
+u16 word16;
+u32 sum;
+int padding=1;
+int i;
+
+	// Find out if the length of data is even or odd number. If odd,
+	// add a padding byte = 0 at the end of packet
+	if (padding&1==1){
+		padd=1;
+		buff[len_udp]=0;
+	}
+
+	//initialize sum to zero
+	sum=0;
+
+	// make 16 bit words out of every two adjacent 8 bit words and
+	// calculate the sum of all 16 vit words
+	for (i=0;i<len_udp+padd;i=i+2){
+		word16 =((buff[i]<<8)&0xFF00)+(buff[i+1]&0xFF);
+		sum = sum + (unsigned long)word16;
+	}
+	// add the UDP pseudo header which contains the IP source and destinationn addresses
+	for (i=0;i<4;i=i+2){
+		word16 =((src_addr[i]<<8)&0xFF00)+(src_addr[i+1]&0xFF);
+		sum=sum+word16;
+	}
+	for (i=0;i<4;i=i+2){
+		word16 =((dest_addr[i]<<8)&0xFF00)+(dest_addr[i+1]&0xFF);
+		sum=sum+word16;
+	}
+	// the protocol number and the length of the UDP packet
+	sum = sum + prot_udp + len_udp;
+
+	// keep only the last 16 bits of the 32 bit calculated sum and add the carries
+    	while (sum>>16)
+		sum = (sum & 0xFFFF)+(sum >> 16);
+
+	// Take the one's complement of sum
+	sum = ~sum;
+
+return ((u16) sum);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(void) {
 	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
 
@@ -89,11 +167,13 @@ int main(void) {
 	eth->h_dest[4] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[4]);
 	eth->h_dest[5] =(unsigned char)(ifreq_c.ifr_hwaddr.sa_data[5]);
 
-	eth->h_proto = htons(ETH_P_IP); //means next header will be IP header
+	eth->h_proto = htons(ETHERTYPE_IPV6); //means next header will be IP header
 
 	/* end of ethernet header */
-	int total_len;
+	int  total_len;
+
 	total_len=sizeof(struct ethhdr);
+
 
 
 	//Constructing ipv6 header
@@ -136,8 +216,10 @@ sendbuff[total_len++] = 0xEE;
 		//UDP length field
 		iphdr->ip6_ctlun.ip6_un1.ip6_un1_plen = htons(total_len - sizeof(struct ethhdr));
 		//IP length field
+		// UDP checksum
+		uh->check=udp_sum_calc(&(uh->len),&(iphdr->ip6_src),&(iphdr->ip6_dst),sendbuff);
 
-        //MAC
+        //MAC//Wysylanie pakeitu
 
 		struct sockaddr_ll sadr_ll;
 		sadr_ll.sll_ifindex = ifreq_i.ifr_ifindex; // index of interface
