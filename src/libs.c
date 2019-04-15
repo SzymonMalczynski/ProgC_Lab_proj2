@@ -25,7 +25,7 @@
 struct Node *head = NULL;
 
 void sendPacket ( unsigned char *sendbuff ){
-
+		char input[32];
 
 	//otwarcie socketa raw do konstrukcji i wysylania datagramow
 		int sock_raw;
@@ -33,10 +33,18 @@ void sendPacket ( unsigned char *sendbuff ){
 		if(sock_raw == -1)
 		printf("error in socket");
 
+
+		printf ("Wpisz nazwe interfejsu  : ");
+		char * interfacen =  malloc (INET6_ADDRSTRLEN);
+		fgets (input, 32, stdin);
+		memcpy ( interfacen, input, strlen (input)-1 ); //funkcja fgets ma nakoncu stringa jeszcze znak
+
+
+
 		//Getting the index name of the interface
 		struct ifreq ifreq_i;
 		memset(&ifreq_i,0,sizeof(ifreq_i));
-		strncpy(ifreq_i.ifr_name,"lo",IFNAMSIZ-1); //giving name of Interface
+		strncpy(ifreq_i.ifr_name,interfacen,IFNAMSIZ-1); //giving name of Interface
 
 		if((ioctl(sock_raw,SIOCGIFINDEX,&ifreq_i))<0)
 		printf("error in index ioctl reading");//getting Index Name
@@ -47,7 +55,7 @@ void sendPacket ( unsigned char *sendbuff ){
 
 		struct ifreq ifreq_c;
 		memset(&ifreq_c,0,sizeof(ifreq_c));
-		strncpy(ifreq_c.ifr_name,"lo",IFNAMSIZ-1);//giving name of Interface
+		strncpy(ifreq_c.ifr_name,interfacen,IFNAMSIZ-1);//giving name of Interface
 
 		if((ioctl(sock_raw,SIOCGIFHWADDR,&ifreq_c))<0) //getting MAC Address
 		printf("error in SIOCGIFHWADDR ioctl reading");
@@ -55,13 +63,13 @@ void sendPacket ( unsigned char *sendbuff ){
 
 		//Getting IP address of the interface
 
-		struct ifreq ifreq_ip;
+		/*struct ifreq ifreq_ip;
 		memset(&ifreq_ip,0,sizeof(ifreq_ip));
-		strncpy(ifreq_ip.ifr_name,"lo",IFNAMSIZ-1);//giving name of Interface
+		strncpy(ifreq_ip.ifr_name,interfacen,IFNAMSIZ-1);//giving name of Interface
 		if(ioctl(sock_raw,SIOCGIFADDR,&ifreq_ip)<0) //getting IP Address
 		{
 		printf("error in SIOCGIFADDR \n");
-		}
+		}*/
 
 
 		//Constructing Ethernet header

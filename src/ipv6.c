@@ -23,17 +23,47 @@
 #include "ipv6.h"
 
 void createipv6header(unsigned char *sendbuff) {
+	char input [32];
+	printf ("Kreator nagłówka IPV6 \n");
+
+
 
 	//Constructing ipv6 header
 	struct ip6_hdr *iphdr = (struct ip6_hdr *)(sendbuff + sizeof(struct ethhdr));
 
-		iphdr->ip6_ctlun.ip6_un1.ip6_un1_flow= htonl ((6 << 28) | (0 << 20) | 0);
-		iphdr->ip6_ctlun.ip6_un1.ip6_un1_hlim=255;
-		iphdr->ip6_ctlun.ip6_un1.ip6_un1_nxt=IPPROTO_UDP;
 
-		int status;
-		status=inet_pton (AF_INET6, "::1", &(iphdr->ip6_dst));
-		status=inet_pton (AF_INET6, "::1", &(iphdr->ip6_src));
+
+	printf ("Podaj Hop Limit  : ");
+	fgets (input, 32, stdin);
+	iphdr->ip6_ctlun.ip6_un1.ip6_un1_hlim=atoi(input);
+
+	printf ("Next header [0] UDP : ");
+	fgets (input, 32, stdin);
+	if (atoi(input)== 0)
+	{
+		iphdr->ip6_ctlun.ip6_un1.ip6_un1_nxt=IPPROTO_UDP;
+	}
+
+
+		iphdr->ip6_ctlun.ip6_un1.ip6_un1_flow= htonl ((6 << 28) | (0 << 20) | 0);
+
+
+		char *src,*dst;
+		 src= malloc (INET6_ADDRSTRLEN);
+	     dst= malloc (INET6_ADDRSTRLEN);
+
+
+		printf ("Src Address: ");
+			fgets (input, 32, stdin);
+			memcpy ( src, input, strlen (input)-1 ); //funkcja fgets ma nakoncu stringa jeszcze znak
+			int status;
+			status=inet_pton (AF_INET6,src, &(iphdr->ip6_src));
+
+		printf ("Dst Address: ");
+		fgets (input, 32, stdin);
+		memcpy ( dst, input, strlen (input)-1 ); //funkcja fgets ma nakoncu stringa jeszcze znak
+		status=inet_pton (AF_INET6,dst, &(iphdr->ip6_dst));
+
 
 
 

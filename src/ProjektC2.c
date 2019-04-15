@@ -39,10 +39,12 @@ int main(void) {
 	char input [32];
 	int *count = malloc (sizeof (int));
 
+
 	//Creating buffer that willl be my packet
 	unsigned char * sendbuff;				//moze wskaznik?
 	sendbuff=(unsigned char*)malloc(64); // increase in case of more data
 	memset(sendbuff,0,64);
+
 
 
 

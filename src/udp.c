@@ -76,12 +76,30 @@ return ((u16) sum);
 
 
 void createudpheader(unsigned char *sendbuff) {
-
+	char input [32];
 	struct udphdr *uh = (struct udphdr *)(sendbuff + sizeof(struct ip6_hdr) + sizeof(struct ethhdr));
 
+	printf ("Kreator nagłówka UDP \n");
 
-	uh->source = htons(23451);
-	uh->dest = htons(23452);
+
+
+	printf ("Podaj port źródłowy  : ");
+	fgets (input, 32, stdin);
+	uh->source = htons(atoi(input));
+
+
+	printf ("Podaj port docelowy  : ");
+	fgets (input, 32, stdin);
+	uh->dest = htons(atoi(input));
+
+
+	printf ("Pole udp checksum i lenght liczone automatycznie nacisnij 1 aby kontynuować   : ");
+	fgets (input, 32, stdin);
+		if (atoi(input)!= 1)
+		{exit (EXIT_FAILURE);}
+
+
+
 	uh->check = 0;
 
 
