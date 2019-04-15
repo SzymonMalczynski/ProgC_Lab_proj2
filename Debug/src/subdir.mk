@@ -4,13 +4,22 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/ProjektC2.c 
+../src/ProjektC2.c \
+../src/ipv6.c \
+../src/libs.c \
+../src/udp.c 
 
 OBJS += \
-./src/ProjektC2.o 
+./src/ProjektC2.o \
+./src/ipv6.o \
+./src/libs.o \
+./src/udp.o 
 
 C_DEPS += \
-./src/ProjektC2.d 
+./src/ProjektC2.d \
+./src/ipv6.d \
+./src/libs.d \
+./src/udp.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
