@@ -24,6 +24,7 @@
  #include <errno.h>
 #include <netpacket/packet.h>
 #include <net/ethernet.h>
+#include <dlfcn.h>
 
 #include "ipv6.h"
 #include "udp.h"
@@ -34,6 +35,14 @@
 
 int main(void) {
 	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+
+	void *handle,*handle2;
+
+	handle=dlopen("/home/student/eclipse-workspacenowe/ProjektC2/src/ipv6.so",RTLD_LAZY);
+		if (!handle) {
+		        printf("Blad ladowania biblioteki");
+		        exit(EXIT_FAILURE);
+		    }
 
 	//wejscie
 	char input [32];
@@ -54,14 +63,42 @@ int main(void) {
 
 		//Constructing ipv6 header
 		struct ip6_hdr *iphdr = (struct ip6_hdr *)(sendbuff + sizeof(struct ethhdr));
+		//wskaznik na funkcje
+		void (*createipv6header)(unsigned char *sendbuff);
+		createipv6header=dlsym(handle,"createipv6header");
 		createipv6header(sendbuff);
+
+		int a1;
+		a1=dlclose(handle);
+		if(a1!=0)
+		{
+			 printf("Blad zamkniecia biblioteki");
+		}
+
 
 
 
 		//Constructing udp header
-		struct udphdr *uh = (struct udphdr *)(sendbuff + sizeof(struct ip6_hdr) + sizeof(struct ethhdr));
-		createudpheader(sendbuff);
 
+		struct udphdr *uh = (struct udphdr *)(sendbuff + sizeof(struct ip6_hdr) + sizeof(struct ethhdr));
+
+		handle2=dlopen("/home/student/eclipse-workspacenowe/ProjektC2/src/udp.so",RTLD_LAZY);
+			if (!handle2) {
+			        printf("Blad ladowania biblioteki");
+			        exit(EXIT_FAILURE);
+			    }
+
+			void (*createudpheader)(unsigned char *sendbuff);
+			createudpheader=dlsym(handle,"createudpheader");
+			createudpheader(sendbuff);
+
+
+			int a2;
+					a2=dlclose(handle);
+					if(a2!=0)
+					{
+						 printf("Blad zamkniecia biblioteki");
+					}
 
 
 

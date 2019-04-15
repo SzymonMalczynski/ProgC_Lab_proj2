@@ -29,7 +29,7 @@ all: ProjektC2
 ProjektC2: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "ProjektC2" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L/home/student/eclipse-workspacenowe/ProjektC2/src -o "ProjektC2" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -16,6 +16,8 @@ struct Node {
 };
 
 void sendPacket ();
+void * LoadUdp ();
+void * LoadIpv6 ();
 
 
 #endif /* LIBS_H_ */

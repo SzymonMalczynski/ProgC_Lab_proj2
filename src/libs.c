@@ -22,7 +22,12 @@
 #include <netpacket/packet.h>
 #include <net/ethernet.h>
 #include "libs.h"
+#include <dlfcn.h>
 struct Node *head = NULL;
+
+
+
+
 
 void sendPacket ( unsigned char *sendbuff ){
 		char input[32];
