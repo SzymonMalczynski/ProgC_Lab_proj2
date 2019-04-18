@@ -12,7 +12,7 @@ struct Node {
 	int id;
 	unsigned char *datagram;
 	struct Node *next;
-	struct Node *prev;
+
 };
 
 void sendPacket ();

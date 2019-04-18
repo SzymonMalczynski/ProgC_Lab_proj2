@@ -38,6 +38,16 @@ void sendPacket ( unsigned char *sendbuff ){
 		if(sock_raw == -1)
 		printf("error in socket");
 
+		  printf ("Ktorego interface'u chcesz uzyc? \n\n");
+		  char cmd[32];
+
+			  //use sys command
+			  sprintf(cmd, "/bin/ip link");
+			  system(cmd);
+
+
+
+
 
 		printf ("Wpisz nazwe interfejsu  : ");
 		char * interfacen =  malloc (INET6_ADDRSTRLEN);
@@ -46,15 +56,34 @@ void sendPacket ( unsigned char *sendbuff ){
 
 
 
+
+
+
+
+
 		//Getting the index name of the interface
 		struct ifreq ifreq_i;
 		memset(&ifreq_i,0,sizeof(ifreq_i));
 		strncpy(ifreq_i.ifr_name,interfacen,IFNAMSIZ-1); //giving name of Interface
 
+
+
 		if((ioctl(sock_raw,SIOCGIFINDEX,&ifreq_i))<0)
 		printf("error in index ioctl reading");//getting Index Name
 
-		printf("index=%d\n",ifreq_i.ifr_ifindex);
+		printf("\n index=%d\n",ifreq_i.ifr_ifindex);
+
+		int l=ifreq_i.ifr_ifindex;
+		if(l==0)
+		{
+			printf("Podaj prawidlowa nazwe interfejsu !\n");
+			exit (EXIT_FAILURE);
+
+		}
+
+
+
+
 
 		//Getting the MAC ADDRESS OF the interface
 
@@ -80,21 +109,37 @@ void sendPacket ( unsigned char *sendbuff ){
 		//Constructing Ethernet header
 
 			struct ethhdr *eth = (struct ethhdr *)(sendbuff);
-
+			/*
 			eth->h_source[0] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[0]);
 			eth->h_source[1] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[1]);
 			eth->h_source[2] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[2]);
 			eth->h_source[3] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[3]);
 			eth->h_source[4] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[4]);
-			eth->h_source[5] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[5]);
+			eth->h_source[5] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[5]);*/
 
 			/* filling destination mac. DESTMAC0 to DESTMAC5 are macro having octets of mac address. */
-			eth->h_dest[0] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[0]);
+			/*eth->h_dest[0] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[0]);
 			eth->h_dest[1] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[1]);
 			eth->h_dest[2] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[2]);
 			eth->h_dest[3] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[3]);
 			eth->h_dest[4] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[4]);
-			eth->h_dest[5] =(unsigned char)(ifreq_c.ifr_hwaddr.sa_data[5]);
+			eth->h_dest[5] =(unsigned char)(ifreq_c.ifr_hwaddr.sa_data[5]);*/
+
+			eth->h_source[0] = 0x01;
+						eth->h_source[1] =0x01;
+						eth->h_source[2] = 0x01;
+						eth->h_source[3] = 0x01;
+						eth->h_source[4] = 0x01;
+						eth->h_source[5] = 0x01;
+
+
+			eth->h_dest[0] = (unsigned char)(ifreq_c.ifr_hwaddr.sa_data[0]);
+									eth->h_dest[1] = 0x02;
+									eth->h_dest[2] = 0x02;
+									eth->h_dest[3] = 0x02;
+									eth->h_dest[4] = 0x02;
+									eth->h_dest[5] =0x02;
+
 
 			eth->h_proto = htons(ETHERTYPE_IPV6); //means next header will be IP header
 
@@ -167,7 +212,6 @@ struct Node *ReserveMem ( unsigned char *datagram ){
 	id++;
 	new_node-> datagram = datagram;
 	new_node->next = NULL;
-	new_node->prev = NULL;
 
 
 	return new_node;
@@ -189,7 +233,7 @@ void InsertTail ( unsigned char *datagram ){
 
 	//dodanie nowego wezla
 	temp->next = new_node;
-	new_node->prev = temp;
+
 	new_node->next = NULL;
 }
 
